@@ -1,11 +1,15 @@
-﻿using WorkoutCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 /*
- HW3 - FitSet.cs
+ HW1 - FitSet.cs
  Name: Bud Robinson
- Date: 11/02/22
+ Date: 09/23/22
 
- Description:Makes an object that encapsulates an exercises name, classification (arms, legs, core),
+ Description: The core class. Makes an object that encapsulates an exercises name, classification (arms, legs, core),
  weight, target repetitions, performed repetitions, and date of completion of the rep.
  */
 
@@ -13,105 +17,60 @@ namespace FitSetCore
 {
     /**
      * Class Invariants:
-     * - weight, repGoal, repDone always greater then or equal to zero when output
+     * - validation = true
      */
-    public partial class FitSet : Workout
+    public class FitSet
     {
-        private string? classification;
-        private int weight = 0;
-        private int repGoal = 0;
-        private int repDone = -1;
+        // Name and Classification default as null
+        public string? name { get; set; }
+        public string? classification { get; set; }
+        public int weight { get; } = 0;
+        public int tReps { get; } = 0;
+        public int pReps { get; private set; } = 0;
+        public bool completion { get; private set; } = false;
+        public DateTime date { get; private set; }
+        public bool validation { get; private set; } = true;
 
-        /* Pre: ints greater then 0 
-         * Post: A FitSet object (incomplete)
-         */
-        public FitSet(string Name, string Classification, int Weight, int RepGoal)
+        public FitSet(int Weight, int TReps)
         {
-            name = Name;
-            classification = Classification;
             weight = Weight;
-            repGoal = RepGoal;
+            tReps = TReps;
         }
 
-        /* Pre: a RepDone greater then -1
-         * Post: The possible validation and completion of an object, can now call score and percentAchieved
+        /* Pre: 
+         * Post: pReps = Preps, validaiton = false if pReps has been changed, completion
+         *       = true if pReps exceeds tReps, date = time of function call.
          */
-        public override void AttemptReps(int RepDone)
+        public void AttemptReps(int Preps)
         {
-            if (repDone >= 0)
+            if (pReps != 0)
             {
                 validation = false;
             }
-            repDone = RepDone;
-            if (repDone >= repGoal)
+            pReps = Preps;
+            if (pReps >= tReps)
             {
                 completion = true;
-            }
-            else
-            {
-                completion = false;
             }
             date = DateTime.Now;
         }
 
-        /* Pre: a repGoal and repDone present, with a goal greater then 0
-         * Post: percentage of reps achieved as an double (100 == 100%)
+        /* Pre: tReps and pReps are an integer greater then 0
+         * Post: percentage of reps achieved as an integer
          */
-        public override double PercentAchieved()
+        public int PercentAchieved()
         {
-            return repDone * 100 / repGoal;
+            return this.pReps * 100 / this.tReps;
         }
 
-        /* Pre: repDone present, then 0
-         * Post: a double representing an arbitrary score
+        /* Pre: weight, tReps, and pReps are inteegers greater than 0
+         * Post: an integer representing an arbitrary score
          */
-        public override double Score()
+        public int Score()
         {
-            return weight * PercentAchieved() / 10;
+            return this.weight * this.PercentAchieved() / 10;
         }
 
-        /* Pre:
-         * Post: return classification
-         */
-        public override string GetClass()
-        {
-            return classification;
-        }
-
-        /* Pre:
-         * Post: return weight
-         */
-        public override int GetWeight()
-        {
-            return weight;
-        }
-
-        /* Pre:
-         * Post: return repGoal
-         */
-        public override double GetRepGoal()
-        {
-            return repGoal;
-        }
-
-        /* Pre:
-         * Post: return repDone
-         */
-        public override double GetRepAchieved()
-        {
-            return repDone;
-        }
-
-        /* Pre: the existance of similar FitSets
-         * Post: a new object, deep copying all of the information in the original object
-         */
-        public override FitSet FitClone()
-        {
-            FitSet Copy = new FitSet(this.name, this.classification, this.weight, this.repGoal);
-            Copy.repDone = this.repDone;
-            Copy.validation = this.validation;
-            Copy.completion = this.completion;
-            return Copy;
-        }
     }
+
 }
